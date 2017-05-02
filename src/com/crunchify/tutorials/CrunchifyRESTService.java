@@ -13,6 +13,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -26,108 +27,109 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import org.bson.Document;
 import org.json.JSONObject;
 //import org.json.JSONString;
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import com.mongodb.DBCollection;
+import com.mongodb.DBCursor;
+import com.mongodb.MongoClient;
+import com.mongodb.MongoClientURI;
+import com.mongodb.client.FindIterable;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
 import com.sun.jersey.json.impl.JSONHelper;
 import com.sun.jersey.json.impl.writer.JsonEncoder;
 
 @Path("/")
 public class CrunchifyRESTService {
 
-	String token = "EAAGG9TjBpZBYBANajcXNZByydAPiNZApfO9PFudZCaZBmco1ZAghfdKz7CRyQIwKpHCahboBWmk2GU2cbZAV5ZCK9bjcmYkc9bLIbNm7YoGAQcP6LxwxoPpBrhO88q5IYlHbX6DavFxECemUw20bYJAsqF5E3ZARrlKxvYhddbxjAugZDZD";
-	static Map<String, String> chattingIdsMap = new HashMap<String, String>();
-	static List<String> waitingIdsList = new ArrayList<String>();
-	static List<String> joinedBefore = new ArrayList<String>();
-	public static int messageid = 0;
 
+	private static int messageid = 0;
 	@POST
 	@Path("/webhook")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public void crunchifyREST(InputStream incomingData) {
 		try {
-			RequestHelper requestHelper = new RequestHelper();
+			RequestParser requestHelper = new RequestParser();
 			boolean checkIfShouldReturn = requestHelper
 					.checkIfShouldReturn(incomingData);
 			if (checkIfShouldReturn) {
 				return;
 			}
-			messageid++;
 			String senderId = requestHelper.getSenderId();
+			RequestHelper.sendInstructions(requestHelper, senderId);
 			
-			if(!joinedBefore.contains(senderId)){
-				joinedBefore.add(senderId);
-				sendPost(requestHelper.generateResponseMessage(senderId,
-					JSONObject.quote("welcome to Friendly Chat bot")));
-				sendPost(requestHelper.generateResponseMessage(senderId,
-						JSONObject.quote("to end chatting type \"disconnect me\" to reconnect with a new user ")));
-				sendPost(requestHelper.generateResponseMessage(senderId,
-						JSONObject.quote("to reconnect with a new user type \"reconnect\"")));
-				sendPost(requestHelper.generateResponseMessage(senderId,
-						JSONObject.quote("once we will found you a match we will notify you")));
-			}
-			if (chattingIdsMap.containsKey(senderId)) {
-				System.out.println("inside chattingid map ");
-				System.out.println(requestHelper.getMessageOnly().toLowerCase()
-						.equals("\"disconnect me\""));
-				if (requestHelper.getMessageOnly().toLowerCase()
-						.equals("\"disconnect me\"")) {
-					String recipientId = chattingIdsMap.get(senderId);
-					chattingIdsMap.remove(senderId);
-					chattingIdsMap.remove(recipientId);
-					sendPost(requestHelper.generateResponseMessage(senderId,
-							JSONObject.quote("you are disconnected, say hi to reconnect")));
-					sendPost(requestHelper.generateResponseMessage(recipientId,
-							JSONObject.quote("your partner left, say hi to reconnect")));
-					return;
-				} else if (requestHelper.getMessageOnly().toLowerCase()
-						.equals("\"reconnect\"")) {
-					String recipientId = chattingIdsMap.get(senderId);
-					chattingIdsMap.remove(senderId);
-					chattingIdsMap.remove(recipientId);
-					sendPost(requestHelper.generateResponseMessage(recipientId,
-							JSONObject.quote("your partner left, say hi to reconnect")));
-					waitingIdsList.add(senderId);
-					return;
-				}
-				String recipientId = chattingIdsMap.get(senderId);
-				sendPost(requestHelper.generateResponse(recipientId));
+			if(RequestHelper.checkAndDisconnect(requestHelper, senderId,Constants.DISCONNECT_ME)){
 				return;
-				// handle chatting
 			}
-			
-			else if (waitingIdsList.isEmpty()) {
-				waitingIdsList.add(senderId);
-				sendPost(requestHelper.generateResponseMessage(senderId,
-						JSONObject.quote("once we find someone , you will be notified")));
+			if(RequestHelper.checkAndDisconnect(requestHelper, senderId,Constants.RECONNECT)){
+				RequestHelper.handleWaitingAndMatchedCases(requestHelper, senderId);
+				return;
+			}
+			if(RequestHelper.isChatting(senderId)){
+				RequestHelper.sendChatMessage(requestHelper, senderId);
 				
-			} else if(!waitingIdsList.contains(senderId)){
-				String recipientId = waitingIdsList.remove(0);
-				chattingIdsMap.put(senderId, recipientId);
-				chattingIdsMap.put(recipientId, senderId);
-				sendPost(requestHelper.generateResponseMessage(recipientId,
-						JSONObject.quote("you are now connected ....")));
-				sendPost(requestHelper.generateResponseMessage(senderId,
-						JSONObject.quote("you are now connected ....")));
-				sendPost(requestHelper.generateResponseMessage(recipientId,
-						requestHelper.getMessageOnly()));
+			}else{
+				RequestHelper.handleWaitingAndMatchedCases(requestHelper, senderId);
 			}
-			System.out
-				.println("chattingIdsMap.size() " + chattingIdsMap.size());
-			System.out
-				.println("chattingIdsMap " + chattingIdsMap.size());
-			System.out.println("waitingIdsList size  " + waitingIdsList.size());
-			System.out.println("waitingIdsList size  " + waitingIdsList);
-			System.out.println("joinedBefore "+joinedBefore.size());
-			System.out.println("joinedBefore "+joinedBefore );
-			// chattingIdsMap.put(senderId, senderId);
-			// waitingIdsList.add(senderId);
-			// String s = requestHelper.generateJsonMessageOnly();
-			// sendPost(s);
+//			System.out
+//				.println("chattingIdsMap.size() " + chattingIdsMap.size());
+//			System.out
+//				.println("chattingIdsMap " + chattingIdsMap.size());
+//			System.out.println("waitingIdsList size  " + waitingIdsList.size());
+//			System.out.println("waitingIdsList size  " + waitingIdsList);
+//			System.out.println("joinedBefore "+joinedBefore.size());
+//			System.out.println("joinedBefore "+joinedBefore );
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	public static void main(String[] args) {
+		MongoClientURI uri = new MongoClientURI(
+		"mongodb://medonagy45:medonagy_2010@cluster0-shard-00-00-t5hjs.mongodb.net:27017,cluster0-shard-00-01-t5hjs.mongodb.net:27017,cluster0-shard-00-02-t5hjs.mongodb.net:27017/Cluster0?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin");
+
+		MongoClient mongoClient = new MongoClient(uri);
+		MongoDatabase database = mongoClient.getDatabase("test");
+//		database.getc
+//		DB db = mongo.getDB("database name")
+		MongoCollection<Document> coll =  database.getCollection("user1");
+		
+		
+		 Document doc = new Document("name", "Andrew12312 Erlichson")//
+         .append("company", "10gen");
+
+//		 coll.insertOne(doc); // first insert
+		 doc.remove("_id"); // remove the _id key
+//		 coll.insertOne(doc); // second insert
+
+		 
+		 FindIterable<Document> cursor = coll.find();
+         int i = 1;
+			for (Iterator it = cursor.iterator(); it
+					.hasNext();) {
+				
+            System.out.println("Inserted Document: "+i); 
+            System.out.println(it.next()); 
+            i++;
+         }
+//		table.insertOne(arg0, arg1);
+//		System.out.println(coll.find().first());
 	}
 
 	@GET
@@ -150,45 +152,10 @@ public class CrunchifyRESTService {
 	@Produces(MediaType.TEXT_PLAIN)
 	public Response verifyRESTService() {
 		String result = "CrunchifyRESTService Successfully started..\n";
-		result += "joinedBefore "+joinedBefore ;
+//		result += "joinedBefore "+joinedBefore ;
 		return Response.status(200).entity(result).build();
 	}
 
-	private void sendPost(String body) throws Exception {
-		System.out.println("the response id " + messageid + " value : " + body);
-		String url = "https://graph.facebook.com/v2.6/me/messages?access_token="
-				+ token;
-
-		URL object = new URL(url);
-
-		HttpURLConnection con = (HttpURLConnection) object.openConnection();
-		con.setDoOutput(true);
-		con.setDoInput(true);
-		con.setRequestProperty("Content-Type", "application/json");
-		con.setRequestProperty("Accept", "application/json");
-		con.setRequestMethod("POST");
-
-		OutputStreamWriter wr = new OutputStreamWriter(con.getOutputStream());
-		wr.write(body);
-		wr.flush();
-		wr.close();
-		// display what returns the POST request
-
-		int HttpResult = con.getResponseCode();
-		if (HttpResult == HttpURLConnection.HTTP_OK) {
-			BufferedReader br = new BufferedReader(new InputStreamReader(
-					con.getInputStream(), "utf-8"));
-			String line = null;
-			while ((line = br.readLine()) != null) {
-				System.out.println("the response of my send " + messageid
-						+ "value :" + line + "\n");
-			}
-			br.close();
-		} else {
-			System.out.println("the error message " + messageid + " "
-					+ con.getResponseCode());
-		}
-
-	}
+	
 
 }

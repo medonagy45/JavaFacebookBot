@@ -1,96 +1,117 @@
 package com.crunchify.tutorials;
 
 import java.io.BufferedReader;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.text.ParseException;
-
-import org.json.JSONObject;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class RequestHelper {
-	JSONObject messaging;
-	boolean isAttachment=false;
-	public boolean checkIfShouldReturn(InputStream incomingData) throws ParseException {
-		JSONObject jsonObj=new JSONObject(getStringFromInput(incomingData));
-		messaging=getMessagingJsonObject(jsonObj);
-		
-		boolean isEcho = messaging.has("message") ? messaging
-				.getJSONObject("message").has("is_echo")
-				: false;
-		if(isEcho)
-			return true;
-		boolean hasDelivery = messaging.has("delivery");
-		if(hasDelivery)
-			return true;
-		boolean hasRead = messaging.has("read");
-		return hasRead ;
-	}
 
-	public String getMessageOnly() {
+	private static int messageid = 0;
+	private static String token = "EAAGG9TjBpZBYBANajcXNZByydAPiNZApfO9PFudZCaZBmco1ZAghfdKz7CRyQIwKpHCahboBWmk2GU2cbZAV5ZCK9bjcmYkc9bLIbNm7YoGAQcP6LxwxoPpBrhO88q5IYlHbX6DavFxECemUw20bYJAsqF5E3ZARrlKxvYhddbxjAugZDZD";
+	private static Map<String, String> chattingIdsMap = new HashMap<String, String>();
+	private static List<String> waitingIdsList = new ArrayList<String>();
+	private static List<String> joinedBefore = new ArrayList<String>();
 
-		if(messaging.getJSONObject("message").has("text")){
-		if(message==null)
-			message =JSONObject.quote(messaging.getJSONObject("message").getString("text"));
-		return message;
+	public static void sendInstructions(RequestParser requestHelper,
+			String senderId) throws Exception {
+		if (!joinedBefore.contains(senderId)) {
+			joinedBefore.add(senderId);
+			sendPost(requestHelper.generateResponseMessage(senderId,
+					Constants.INSTRUCTIONS));
 		}
-		return "";
 	}
-	public String getِِِAttachment() {
-		if(message==null)
-			message =JSONObject.quote(messaging.getJSONObject("message").getJSONArray("attachments")
-					.getJSONObject(0).getJSONObject("payload").getString("url"));
-		return message;
+
+	public static boolean checkAndDisconnect(RequestParser requestHelper,
+			String senderId,String condition) throws Exception {
+		if (requestHelper.getMessageOnly().toLowerCase()
+				.equals(condition)) {
+			disconnectMeAction(requestHelper,senderId);
+			return true;
+		}
+		return false;
+	}
+	public static boolean isChatting(String senderId) {
+		return chattingIdsMap.containsKey(senderId);
+	}
+	private static void disconnectMeAction(RequestParser requestHelper,
+			String senderId) throws Exception{
+		chattingIdsMap.remove(senderId);
+		sendPost(requestHelper.generateResponseMessage(senderId,
+				Constants.YOU_ARE_DISCONNECTED));
+		if (chattingIdsMap.containsKey(senderId)) {
+			String recipientId = chattingIdsMap.get(senderId);
+			chattingIdsMap.remove(recipientId);
+			sendPost(requestHelper.generateResponseMessage(recipientId,
+					Constants.YOUR_PARTNER_LEFT));
+		}
+	}
+	public static void handleWaitingAndMatchedCases(RequestParser requestHelper,
+			String senderId) throws Exception {
+		if (waitingIdsList.isEmpty()) {
+			waitingIdsList.add(senderId);
+			sendPost(requestHelper.generateResponseMessage(senderId,
+					Constants.ONCE_FIND_SOMEONE));
+			
+		} else if(!waitingIdsList.contains(senderId)){
+			String recipientId = waitingIdsList.remove(0);
+			chattingIdsMap.put(senderId, recipientId);
+			chattingIdsMap.put(recipientId, senderId);
+			sendPost(requestHelper.generateResponseMessage(recipientId,
+					Constants.YOU_ARE_CONNECTED));
+			sendPost(requestHelper.generateResponseMessage(senderId,
+					Constants.YOU_ARE_CONNECTED));
+			sendPost(requestHelper.generateResponseMessage(recipientId,
+					requestHelper.getMessageOnly()));
+		}
+	}
+	public static void sendChatMessage(RequestParser requestHelper, String senderId)
+			throws Exception {
+			String recipientId = chattingIdsMap.get(senderId);
+			sendPost(requestHelper.generateResponse(recipientId));
+			
 	}
 	
-	private String senderId;
-	private String message;
-	public String getSenderId() {		
-		if(senderId==null)
-			senderId=messaging.getJSONObject("sender").getString("id");
-		System.out.println("this is the recieved message "+CrunchifyRESTService.messageid+" " +messaging);
-		return senderId;
-	}
 
-	public String generateResponse(String id) {
-		System.out.println(messaging.getJSONObject("message").has("text"));
-		if(messaging.getJSONObject("message").has("text")){
-			String message = getMessageOnly();
-			return generateResponseMessage(id,message);
-		}
-		String attachment= getِِِAttachment();
-		return generateResponseMessage(id,attachment);
-	}
+	private static void sendPost(String body) throws Exception {
+		System.out.println("the response id " + messageid + " value : " + body);
+		String url = "https://graph.facebook.com/v2.6/me/messages?access_token="
+				+ token;
 
-	public String generateResponseMessage( String id,String message) {
-		return "{\"recipient\": {\"id\": \"" + id
-				+ "\"},\"message\": {\"text\": " + message + "}}";
-	}
-	
-	public String generateResponseAttachment( String id,String attachment) {
-		return "{\"recipient\": {\"id\": \"" + id
-				+ "\"},\"message\": {\"attachment\":{\"payload\":{\"url\":"+attachment+"},\"type\":\"image\"}}";
-	}
+		URL object = new URL(url);
 
-	private JSONObject getMessagingJsonObject(JSONObject jsonObjParent) {
-		return jsonObjParent.getJSONArray("entry").getJSONObject(0)
-				.getJSONArray("messaging").getJSONObject(0);
-	}
-	private String getStringFromInput(InputStream incomingData) {
-		StringBuilder crunchifyBuilder = new StringBuilder();
-		try {
-			BufferedReader in = new BufferedReader(new InputStreamReader(incomingData,"UTF-8"));
-//			BufferedReader in = new BufferedReader(new InputStreamReader(
-//					incomingData));
+		HttpURLConnection con = (HttpURLConnection) object.openConnection();
+		con.setDoOutput(true);
+		con.setDoInput(true);
+		con.setRequestProperty("Content-Type", "application/json");
+		con.setRequestProperty("Accept", "application/json");
+		con.setRequestMethod("POST");
+
+		OutputStreamWriter wr = new OutputStreamWriter(con.getOutputStream());
+		wr.write(body);
+		wr.flush();
+		wr.close();
+		// display what returns the POST request
+
+		int HttpResult = con.getResponseCode();
+		if (HttpResult == HttpURLConnection.HTTP_OK) {
+			BufferedReader br = new BufferedReader(new InputStreamReader(
+					con.getInputStream(), "utf-8"));
 			String line = null;
-			while ((line = in.readLine()) != null) {
-//				System.out.println(line);
-				crunchifyBuilder.append(line);
+			while ((line = br.readLine()) != null) {
+				System.out.println("the response of my send " + messageid
+						+ "value :" + line + "\n");
 			}
-//			System.out.println("asdas "+crunchifyBuilder.toString());
-		} catch (Exception e) {
-			System.out.println("Error Parsing: - "+e.getMessage());
+			br.close();
+		} else {
+			System.out.println("the error message " + messageid + " "
+					+ con.getResponseCode());
 		}
-		return crunchifyBuilder.toString();
+
 	}
-	
 }
