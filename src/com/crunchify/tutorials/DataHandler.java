@@ -43,6 +43,7 @@ public class DataHandler {
 	static Logger logger = Logger.getLogger(MainService.class);
 	
 	public static boolean isJoinedBefore(String senderId){
+		System.out.println("hi*//********************************************************************");
 		logger.info("hello");
 		BasicDBObject whereQuery = new BasicDBObject();
 		  whereQuery.put("senderId", senderId);
