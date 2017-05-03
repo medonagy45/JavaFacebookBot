@@ -44,10 +44,10 @@ public class DataHandler {
 	
 	public static boolean isJoinedBefore(String senderId){
 		System.out.println("hi*//********************************************************************");
-		logger.info("hello");
 		BasicDBObject whereQuery = new BasicDBObject();
 		  whereQuery.put("senderId", senderId);
 		  DBCursor cursor3 = joinedBeforeIds.find(whereQuery);
+		  System.out.println(cursor3.hasNext()+" "+cursor3.size());
 		  return cursor3.hasNext();
 //		return joinedBefore.contains(senderId);
 	}
