@@ -20,6 +20,7 @@ import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import com.mongodb.MongoException;
+import com.mongodb.WriteResult;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
@@ -30,15 +31,16 @@ public class DataHandler {
 
 	static MongoClient mongoClient = new MongoClient(uri);
 
-	 static DB db = mongoClient.getDB("facebookChatBot");
+	 @SuppressWarnings("deprecation")
+	static DB db = mongoClient.getDB("facebookChatBot");
 
-	  DBCollection chattingIds = db.getCollection("chattingIds");
-	  DBCollection waitingIds = db.getCollection("waitingIds");
+	  static DBCollection chattingIds = db.getCollection("chattingIds");
+	  static DBCollection waitingIds = db.getCollection("waitingIds");
 	  static DBCollection joinedBeforeIds = db.getCollection("joinedBeforeIds");
 	  
-	private static Map<String, String> chattingIdsMap = new HashMap<String, String>();
-	private static List<String> waitingIdsList = new ArrayList<String>();
-	private static List<String> joinedBefore = new ArrayList<String>();
+//	private static Map<String, String> chattingIdsMap = new HashMap<String, String>();
+//	private static List<String> waitingIdsList = new ArrayList<String>();
+//	private static List<String> joinedBefore = new ArrayList<String>();
 
 	static Logger logger = Logger.getLogger(MainService.class);
 	
@@ -57,28 +59,65 @@ public class DataHandler {
 		joinedBeforeIds.insert(data);
 	}
 	public static boolean isInChattingBool(String senderId) {
-		return chattingIdsMap.containsKey(senderId);
+		BasicDBObject whereQuery = new BasicDBObject();
+		  whereQuery.put("senderId", senderId);
+		  DBCursor cursor3 = chattingIds.find(whereQuery);
+		  System.out.println("chattingIds in bool"+cursor3.hasNext()+" "+cursor3.size());
+		  return cursor3.hasNext();
+		//return chattingIdsMap.containsKey(senderId);
 	}
 	public static void removeFromChattingBool(String senderId) {
-		 chattingIdsMap.remove(senderId);
+		BasicDBObject whereQuery = new BasicDBObject();
+		  whereQuery.put("senderId", senderId);
+		  WriteResult cursor3 = chattingIds.remove(whereQuery);
+		  System.out.println("chattingIds in bool"+cursor3.toString());
+//		 chattingIdsMap.remove(senderId);
 	}
 	public static void addInChattingBool(String senderId,String recipientId) {
-		chattingIdsMap.put(senderId,recipientId);
+		BasicDBObject data = new BasicDBObject();
+		data.append("senderId", senderId);
+		data.append("recipientId", recipientId);
+		chattingIds.insert(data);
+//		chattingIdsMap.put(senderId,recipientId);
 	}
 	public static String getRecipientId(String senderId) {
-		return chattingIdsMap.get(senderId);
+		BasicDBObject whereQuery = new BasicDBObject();
+		  whereQuery.put("senderId", senderId);
+		  DBCursor cursor3 = chattingIds.find(whereQuery);
+		  String recipientId="";
+		  if (cursor3.hasNext()) {
+			  recipientId=(String) cursor3.next().get("recipientId");
+			
+		  }
+		  System.out.println("getRecipientId "+recipientId);
+		  return recipientId;
+//		return chattingIdsMap.get(senderId);
 	}
 	public static boolean isWaitingListEmpty() {
-		return waitingIdsList.isEmpty();
+	  DBCursor cursor3 = waitingIds.find();
+	  System.out.println(cursor3.hasNext()+" "+cursor3.size());
+	  return !cursor3.hasNext();
 	}
 	public static boolean isInWaitingList(String senderId) {
-		return waitingIdsList.contains(senderId);
+		BasicDBObject whereQuery = new BasicDBObject();
+		  whereQuery.put("senderId", senderId);
+		  DBCursor cursor3 = waitingIds.find(whereQuery);
+		  System.out.println("isInWaitingList "+cursor3.hasNext()+" "+cursor3.size());
+		  return cursor3.hasNext();
+//		return waitingIdsList.contains(senderId);
 	}
 	public static void addToWaitingList(String senderId) {
-		waitingIdsList.add(senderId);
+		BasicDBObject data = new BasicDBObject();
+		data.append("senderId", senderId);
+		waitingIds.insert(data);
+//		waitingIdsList.add(senderId);
 	}
 	public static String removeFromWaitingList() {
-		return waitingIdsList.remove(0);
+		DBObject doc = waitingIds.findOne(); //get first document
+		waitingIds.remove(doc);
+		System.out.println("removeFromWaitingList "+(String) doc.get("senderId"));
+		return (String) doc.get("senderId");
+//		return waitingIdsList.remove(0);
 	}
 	
 	
@@ -141,7 +180,8 @@ public class DataHandler {
 	  whereQuery.put("number", 5);
 	  DBCursor cursor3 = collection.find(whereQuery);
 	  while (cursor3.hasNext()) {
-		System.out.println(cursor3.next());
+			System.out.println("hi");
+			System.out.println(cursor3.next().get("name"));
 	  }
 
 	  System.out.println("\n2. Find where number in 2,4 and 5");
