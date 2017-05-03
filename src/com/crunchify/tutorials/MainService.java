@@ -5,18 +5,11 @@ package com.crunchify.tutorials;
  *
  */
 
-import java.io.BufferedReader;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.ServletException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -27,37 +20,17 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import org.bson.Document;
-import org.json.JSONObject;
+import org.apache.log4j.Logger;
 //import org.json.JSONString;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
-import com.mongodb.MongoClient;
-import com.mongodb.MongoClientURI;
-import com.mongodb.client.FindIterable;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
-import com.sun.jersey.json.impl.JSONHelper;
-import com.sun.jersey.json.impl.writer.JsonEncoder;
-
 @Path("/")
-public class CrunchifyRESTService {
-
+public class MainService {
+	Logger logger = Logger.getLogger(MainService.class);
+	public void init()
+		    throws ServletException
+		{
+			logger.info("hello world!!!!!");
+		}
 
 	private static int messageid = 0;
 	@POST

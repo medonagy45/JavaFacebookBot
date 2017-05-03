@@ -14,14 +14,11 @@ public class RequestHelper {
 
 	private static int messageid = 0;
 	private static String token = "EAAGG9TjBpZBYBANajcXNZByydAPiNZApfO9PFudZCaZBmco1ZAghfdKz7CRyQIwKpHCahboBWmk2GU2cbZAV5ZCK9bjcmYkc9bLIbNm7YoGAQcP6LxwxoPpBrhO88q5IYlHbX6DavFxECemUw20bYJAsqF5E3ZARrlKxvYhddbxjAugZDZD";
-	private static Map<String, String> chattingIdsMap = new HashMap<String, String>();
-	private static List<String> waitingIdsList = new ArrayList<String>();
-	private static List<String> joinedBefore = new ArrayList<String>();
 
 	public static void sendInstructions(RequestParser requestHelper,
 			String senderId) throws Exception {
-		if (!joinedBefore.contains(senderId)) {
-			joinedBefore.add(senderId);
+		if (!DataHandler.isJoinedBefore(senderId)) {
+			DataHandler.addNewJoinedBefore(senderId);
 			sendPost(requestHelper.generateResponseMessage(senderId,
 					Constants.INSTRUCTIONS));
 		}
@@ -37,17 +34,17 @@ public class RequestHelper {
 	}
 
 	public static boolean isChatting(String senderId) {
-		return chattingIdsMap.containsKey(senderId);
+		return DataHandler.isInChattingBool(senderId);
 	}
 
 	private static void disconnectMeAction(RequestParser requestHelper,
 			String senderId) throws Exception {
 		sendPost(requestHelper.generateResponseMessage(senderId,
 				Constants.YOU_ARE_DISCONNECTED));
-		if (chattingIdsMap.containsKey(senderId)) {
-			String recipientId = chattingIdsMap.get(senderId);
-			chattingIdsMap.remove(senderId);
-			chattingIdsMap.remove(recipientId);
+		if (DataHandler.isInChattingBool(senderId)) {
+			String recipientId = DataHandler.getRecipientId(senderId);
+			DataHandler.removeFromChattingBool(senderId);
+			DataHandler.removeFromChattingBool(recipientId);
 			sendPost(requestHelper.generateResponseMessage(recipientId,
 					Constants.YOUR_PARTNER_LEFT));
 		}
@@ -55,15 +52,15 @@ public class RequestHelper {
 
 	public static void handleWaitingAndMatchedCases(
 			RequestParser requestHelper, String senderId) throws Exception {
-		if (waitingIdsList.isEmpty()) {
-			waitingIdsList.add(senderId);
+		if (DataHandler.isWaitingListEmpty()) {
+			DataHandler.addToWaitingList(senderId);
 			sendPost(requestHelper.generateResponseMessage(senderId,
 					Constants.ONCE_FIND_SOMEONE));
 
-		} else if (!waitingIdsList.contains(senderId)) {
-			String recipientId = waitingIdsList.remove(0);
-			chattingIdsMap.put(senderId, recipientId);
-			chattingIdsMap.put(recipientId, senderId);
+		} else if (!DataHandler.isInWaitingList(senderId)) {
+			String recipientId = DataHandler.removeFromWaitingList();;
+			DataHandler.addInChattingBool(senderId, recipientId);
+			DataHandler.addInChattingBool(recipientId, senderId);
 			sendPost(requestHelper.generateResponseMessage(recipientId,
 					Constants.YOU_ARE_CONNECTED));
 			sendPost(requestHelper.generateResponseMessage(senderId,
@@ -75,7 +72,7 @@ public class RequestHelper {
 
 	public static void sendChatMessage(RequestParser requestHelper,
 			String senderId) throws Exception {
-		String recipientId = chattingIdsMap.get(senderId);
+		String recipientId = DataHandler.getRecipientId(senderId);
 		sendPost(requestHelper.generateResponse(recipientId));
 
 	}
