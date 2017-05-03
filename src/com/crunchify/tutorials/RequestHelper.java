@@ -28,37 +28,39 @@ public class RequestHelper {
 	}
 
 	public static boolean checkAndDisconnect(RequestParser requestHelper,
-			String senderId,String condition) throws Exception {
-		if (requestHelper.getMessageOnly().toLowerCase()
-				.equals(condition)) {
-			disconnectMeAction(requestHelper,senderId);
+			String senderId, String condition) throws Exception {
+		if (requestHelper.getMessageOnly().toLowerCase().equals(condition)) {
+			disconnectMeAction(requestHelper, senderId);
 			return true;
 		}
 		return false;
 	}
+
 	public static boolean isChatting(String senderId) {
 		return chattingIdsMap.containsKey(senderId);
 	}
+
 	private static void disconnectMeAction(RequestParser requestHelper,
-			String senderId) throws Exception{
-		chattingIdsMap.remove(senderId);
+			String senderId) throws Exception {
 		sendPost(requestHelper.generateResponseMessage(senderId,
 				Constants.YOU_ARE_DISCONNECTED));
 		if (chattingIdsMap.containsKey(senderId)) {
 			String recipientId = chattingIdsMap.get(senderId);
+			chattingIdsMap.remove(senderId);
 			chattingIdsMap.remove(recipientId);
 			sendPost(requestHelper.generateResponseMessage(recipientId,
 					Constants.YOUR_PARTNER_LEFT));
 		}
 	}
-	public static void handleWaitingAndMatchedCases(RequestParser requestHelper,
-			String senderId) throws Exception {
+
+	public static void handleWaitingAndMatchedCases(
+			RequestParser requestHelper, String senderId) throws Exception {
 		if (waitingIdsList.isEmpty()) {
 			waitingIdsList.add(senderId);
 			sendPost(requestHelper.generateResponseMessage(senderId,
 					Constants.ONCE_FIND_SOMEONE));
-			
-		} else if(!waitingIdsList.contains(senderId)){
+
+		} else if (!waitingIdsList.contains(senderId)) {
 			String recipientId = waitingIdsList.remove(0);
 			chattingIdsMap.put(senderId, recipientId);
 			chattingIdsMap.put(recipientId, senderId);
@@ -70,13 +72,13 @@ public class RequestHelper {
 					requestHelper.getMessageOnly()));
 		}
 	}
-	public static void sendChatMessage(RequestParser requestHelper, String senderId)
-			throws Exception {
-			String recipientId = chattingIdsMap.get(senderId);
-			sendPost(requestHelper.generateResponse(recipientId));
-			
+
+	public static void sendChatMessage(RequestParser requestHelper,
+			String senderId) throws Exception {
+		String recipientId = chattingIdsMap.get(senderId);
+		sendPost(requestHelper.generateResponse(recipientId));
+
 	}
-	
 
 	private static void sendPost(String body) throws Exception {
 		System.out.println("the response id " + messageid + " value : " + body);
