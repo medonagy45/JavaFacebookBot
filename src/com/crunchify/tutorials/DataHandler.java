@@ -46,7 +46,7 @@ public class DataHandler {
 	
 	public static boolean isJoinedBefore(String senderId){
 		printall(joinedBeforeIds);
-		System.out.println(senderId);
+		System.out.println("isJoinedBefore senderId "+senderId);
 		System.out.println("hi*//********************************************************************");
 		BasicDBObject whereQuery = new BasicDBObject();
 		  whereQuery.put("senderId", senderId);
@@ -132,36 +132,43 @@ public class DataHandler {
 		  }
 
 	}
-	public static void insertDummyDocuments(DBCollection collection) {
-
-		List<DBObject> list = new ArrayList<DBObject>();
-
-		Calendar cal = Calendar.getInstance();
-
-		for (int i = 1; i <= 5; i++) {
-
-			BasicDBObject data = new BasicDBObject();
-			data.append("number", i);
-			data.append("name", "mkyong-" + i);
-			// data.append("date", cal.getTime());
-
-			// +1 day
-//			cal.add(Calendar.DATE, 1);
-
-			list.add(data);
-
-		}
-
-		collection.insert(list);
-
-	}
+//	public static void insertDummyDocuments(DBCollection collection) {
+//
+//		List<DBObject> list = new ArrayList<DBObject>();
+//
+//		Calendar cal = Calendar.getInstance();
+//
+//		for (int i = 1; i <= 5; i++) {
+//
+//			BasicDBObject data = new BasicDBObject();
+//			data.append("number", i);
+//			data.append("name", "mkyong-" + i);
+//			// data.append("date", cal.getTime());
+//
+//			// +1 day
+////			cal.add(Calendar.DATE, 1);
+//
+//			list.add(data);
+//
+//		}
+//
+//		collection.insert(list);
+//
+//	}
 
 	public static void main(String[] args) {
-		chattingIds.drop();
-		joinedBeforeIds.drop();
-		waitingIds.drop();
-//
-//	try {
+//************** dropping the tables ********************************************************************
+//		chattingIds.drop();
+//		joinedBeforeIds.drop();
+//		waitingIds.drop();
+//-------------- print all tables    --------------------------------------------------------------------
+		System.out.println("chattingIds");
+		printall(chattingIds);
+		System.out.println("joinedBeforeIds");
+		printall(joinedBeforeIds);
+		System.out.println("waitingIds");
+		printall(waitingIds);
+		//	try {
 //
 //
 //	  // get a single collection

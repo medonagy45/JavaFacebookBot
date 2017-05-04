@@ -54,10 +54,13 @@ public class MainService {
 				RequestHelper.handleWaitingAndMatchedCases(requestHelper, senderId);
 				return;
 			}
+			System.out.println("didn't disconnect");
 			if(RequestHelper.isChatting(senderId)){
+				System.out.println("someone Is chatting here ");
 				RequestHelper.sendChatMessage(requestHelper, senderId);
 				
 			}else{
+				
 				RequestHelper.handleWaitingAndMatchedCases(requestHelper, senderId);
 			}
 //			System.out

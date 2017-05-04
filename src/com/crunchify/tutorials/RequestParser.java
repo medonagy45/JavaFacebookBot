@@ -83,7 +83,7 @@ public class RequestParser {
 //					incomingData));
 			String line = null;
 			while ((line = in.readLine()) != null) {
-//				System.out.println(line);
+				System.out.println(line);
 				crunchifyBuilder.append(line);
 			}
 //			System.out.println("asdas "+crunchifyBuilder.toString());
