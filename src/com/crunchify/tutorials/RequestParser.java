@@ -58,7 +58,7 @@ public class RequestParser {
 			return generateResponseMessage(id,message);
 		}
 		String attachment= getِِِAttachment();
-		return generateResponseMessage(id,attachment);
+		return generateResponseAttachment(id,attachment);
 	}
 
 	public String generateResponseMessage( String id,String message) {
