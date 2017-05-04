@@ -58,7 +58,7 @@ public class RequestHelper {
 					Constants.ONCE_FIND_SOMEONE));
 
 		} else if (!DataHandler.isInWaitingList(senderId)) {
-			String recipientId = DataHandler.removeFromWaitingList();;
+			String recipientId = DataHandler.removeFromWaitingList();
 			DataHandler.addInChattingBool(senderId, recipientId);
 			DataHandler.addInChattingBool(recipientId, senderId);
 			sendPost(requestHelper.generateResponseMessage(recipientId,

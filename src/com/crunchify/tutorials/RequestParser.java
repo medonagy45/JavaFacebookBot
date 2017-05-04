@@ -68,7 +68,7 @@ public class RequestParser {
 	
 	public String generateResponseAttachment( String id,String attachment) {
 		return "{\"recipient\": {\"id\": \"" + id
-				+ "\"},\"message\": {\"attachment\":{\"payload\":{\"url\":"+attachment+"},\"type\":\"image\"}}";
+				+ "\"},\"message\": {\"attachment\":{\"type\":\"image\",\"payload\":{\"url\":"+attachment+"}}}";
 	}
 
 	private JSONObject getMessagingJsonObject(JSONObject jsonObjParent) {
