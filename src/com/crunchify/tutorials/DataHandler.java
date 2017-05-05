@@ -162,6 +162,7 @@ public class DataHandler {
 //		joinedBeforeIds.drop();
 //		waitingIds.drop();
 //-------------- print all tables    --------------------------------------------------------------------
+		
 		System.out.println("chattingIds");
 		printall(chattingIds);
 		System.out.println("joinedBeforeIds");

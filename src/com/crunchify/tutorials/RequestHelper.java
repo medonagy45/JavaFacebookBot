@@ -28,6 +28,9 @@ public class RequestHelper {
 			String senderId, String condition) throws Exception {
 		if (requestHelper.getMessageOnly().toLowerCase().equals(condition)) {
 			disconnectMeAction(requestHelper, senderId);
+			if(condition.equals(Constants.DISCONNECT_ME))
+				sendPost(requestHelper.generateResponseMessage(senderId,
+						Constants.SAY_HI_TO_RECONNECT));
 			return true;
 		}
 		return false;
@@ -47,6 +50,8 @@ public class RequestHelper {
 			DataHandler.removeFromChattingBool(recipientId);
 			sendPost(requestHelper.generateResponseMessage(recipientId,
 					Constants.YOUR_PARTNER_LEFT));
+			sendPost(requestHelper.generateResponseMessage(recipientId,
+					Constants.SAY_HI_TO_RECONNECT));
 		}
 	}
 
