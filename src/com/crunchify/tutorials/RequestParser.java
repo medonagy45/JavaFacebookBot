@@ -27,23 +27,22 @@ public class RequestParser {
 	}
 
 	public String getMessageOnly() {
-
 		if(messaging.getJSONObject("message").has("text")){
-		if(message==null)
-			message =JSONObject.quote(messaging.getJSONObject("message").getString("text"));
-		return message;
+			return JSONObject.quote(messaging.getJSONObject("message").getString("text"));
 		}
 		return "";
 	}
 	public String getِِِAttachment() {
-		if(message==null)
-			message =JSONObject.quote(messaging.getJSONObject("message").getJSONArray("attachments")
+		
+		return JSONObject.quote(messaging.getJSONObject("message").getJSONArray("attachments")
 					.getJSONObject(0).getJSONObject("payload").getString("url"));
-		return message;
+	}
+	public String getِِِAttachmentType() {
+		return JSONObject.quote(messaging.getJSONObject("message").getJSONArray("attachments")
+					.getJSONObject(0).getString("type"));
 	}
 	
 	private String senderId;
-	private String message;
 	public String getSenderId() {		
 		if(senderId==null)
 			senderId=messaging.getJSONObject("sender").getString("id");
@@ -58,7 +57,8 @@ public class RequestParser {
 			return generateResponseMessage(id,message);
 		}
 		String attachment= getِِِAttachment();
-		return generateResponseAttachment(id,attachment);
+		String type= getِِِAttachmentType();
+		return generateResponseAttachment(id,attachment,type);
 	}
 
 	public String generateResponseMessage( String id,String message) {
@@ -66,9 +66,9 @@ public class RequestParser {
 				+ "\"},\"message\": {\"text\": " + message + "}}";
 	}
 	
-	public String generateResponseAttachment( String id,String attachment) {
+	public String generateResponseAttachment( String id,String attachment,String type) {
 		return "{\"recipient\": {\"id\": \"" + id
-				+ "\"},\"message\": {\"attachment\":{\"type\":\"image\",\"payload\":{\"url\":"+attachment+"}}}}";
+				+ "\"},\"message\": {\"attachment\":{\"type\":"+type+",\"payload\":{\"url\":"+attachment+"}}}}";
 	}
 
 	private JSONObject getMessagingJsonObject(JSONObject jsonObjParent) {
