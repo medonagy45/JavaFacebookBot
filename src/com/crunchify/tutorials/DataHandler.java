@@ -163,10 +163,10 @@ public class DataHandler {
 //		waitingIds.drop();
 //-------------- print all tables    --------------------------------------------------------------------
 		
-		System.out.println("chattingIds");
-		printall(chattingIds);
-		System.out.println("joinedBeforeIds");
-		printall(joinedBeforeIds);
+//		System.out.println("chattingIds");
+//		printall(chattingIds);
+//		System.out.println("joinedBeforeIds");
+//		printall(joinedBeforeIds);
 		System.out.println("waitingIds");
 		printall(waitingIds);
 		//	try {

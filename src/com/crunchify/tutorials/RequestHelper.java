@@ -28,9 +28,12 @@ public class RequestHelper {
 			String senderId, String condition) throws Exception {
 		if (requestHelper.getMessageOnly().toLowerCase().equals(condition)) {
 			disconnectMeAction(requestHelper, senderId);
-			if(condition.equals(Constants.DISCONNECT_ME))
+			if(condition.equals(Constants.DISCONNECT_ME)){
+				if(DataHandler.isInWaitingList(senderId))
+					DataHandler.removeFromWaitingList();
 				sendPost(requestHelper.generateResponseMessage(senderId,
 						Constants.SAY_HI_TO_RECONNECT));
+			}
 			return true;
 		}
 		return false;
