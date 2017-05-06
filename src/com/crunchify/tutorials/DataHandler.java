@@ -27,7 +27,7 @@ import com.mongodb.client.MongoDatabase;
 
 public class DataHandler {
 	static MongoClientURI uri = new MongoClientURI(
-			"");
+			"mongodb://medonagy45:medonagy_2010@cluster0-shard-00-00-t5hjs.mongodb.net:27017,cluster0-shard-00-01-t5hjs.mongodb.net:27017,cluster0-shard-00-02-t5hjs.mongodb.net:27017/Cluster0?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin");
 
 	static MongoClient mongoClient = new MongoClient(uri);
 

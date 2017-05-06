@@ -13,7 +13,7 @@ import java.util.Map;
 public class RequestHelper {
 
 	private static int messageid = 0;
-	private static String pageToken = "";
+	private static String pageToken = "EAAGG9TjBpZBYBANajcXNZByydAPiNZApfO9PFudZCaZBmco1ZAghfdKz7CRyQIwKpHCahboBWmk2GU2cbZAV5ZCK9bjcmYkc9bLIbNm7YoGAQcP6LxwxoPpBrhO88q5IYlHbX6DavFxECemUw20bYJAsqF5E3ZARrlKxvYhddbxjAugZDZD";
 
 	public static void sendInstructions(RequestParser requestHelper,
 			String senderId) throws Exception {
