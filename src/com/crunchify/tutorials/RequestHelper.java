@@ -13,7 +13,7 @@ import java.util.Map;
 public class RequestHelper {
 
 	private static int messageid = 0;
-	private static String token = "EAAGG9TjBpZBYBANajcXNZByydAPiNZApfO9PFudZCaZBmco1ZAghfdKz7CRyQIwKpHCahboBWmk2GU2cbZAV5ZCK9bjcmYkc9bLIbNm7YoGAQcP6LxwxoPpBrhO88q5IYlHbX6DavFxECemUw20bYJAsqF5E3ZARrlKxvYhddbxjAugZDZD";
+	private static String pageToken = "";
 
 	public static void sendInstructions(RequestParser requestHelper,
 			String senderId) throws Exception {
@@ -85,7 +85,7 @@ public class RequestHelper {
 	private static void sendPost(String body) throws Exception {
 		System.out.println("the response id " + messageid + " value : " + body);
 		String url = "https://graph.facebook.com/v2.6/me/messages?access_token="
-				+ token;
+				+ pageToken;
 
 		URL object = new URL(url);
 
