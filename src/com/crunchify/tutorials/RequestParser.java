@@ -46,7 +46,6 @@ public class RequestParser {
 	public String getSenderId() {		
 		if(senderId==null)
 			senderId=messaging.getJSONObject("sender").getString("id");
-//		System.out.println("this is the recieved message "+CrunchifyRESTService.messageid+" " +messaging);
 		return senderId;
 	}
 

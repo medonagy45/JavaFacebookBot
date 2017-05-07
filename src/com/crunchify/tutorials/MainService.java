@@ -25,13 +25,6 @@ import org.apache.log4j.Logger;
 
 @Path("/")
 public class MainService {
-	Logger logger = Logger.getLogger(MainService.class);
-	public void init()
-		    throws ServletException
-		{
-			logger.info("hello world!!!!!");
-		}
-
 	private static int messageid = 0;
 	@POST
 	@Path("/webhook")
@@ -63,14 +56,6 @@ public class MainService {
 				
 				RequestHelper.handleWaitingAndMatchedCases(requestHelper, senderId);
 			}
-//			System.out
-//				.println("chattingIdsMap.size() " + chattingIdsMap.size());
-//			System.out
-//				.println("chattingIdsMap " + chattingIdsMap.size());
-//			System.out.println("waitingIdsList size  " + waitingIdsList.size());
-//			System.out.println("waitingIdsList size  " + waitingIdsList);
-//			System.out.println("joinedBefore "+joinedBefore.size());
-//			System.out.println("joinedBefore "+joinedBefore );
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -72,22 +72,39 @@ public class RequestHelper {
 
 		} else if (!DataHandler.isInWaitingList(senderId)) {
 			String recipientId = DataHandler.removeFromWaitingList();
-			DataHandler.addInChattingBool(senderId, recipientId);
-			DataHandler.addInChattingBool(recipientId, senderId);
-			sendPost(requestHelper.generateResponseMessage(recipientId,
-					getGenderAndLanguage(senderId)));
-			sendPost(requestHelper.generateResponseMessage(senderId,
-					getGenderAndLanguage(recipientId)));
+			connectTwoPeopleTogether(requestHelper, senderId, recipientId);
 			sendPost(requestHelper.generateResponseMessage(recipientId,
 					requestHelper.getMessageOnly()));
 		}
 	}
 
+	private static void connectTwoPeopleTogether(RequestParser requestHelper,
+			String senderId, String recipientId) throws Exception,
+			ParseException {
+		DataHandler.addInChattingBool(senderId, recipientId);
+		DataHandler.addInChattingBool(recipientId, senderId);
+		sendPost(requestHelper.generateResponseMessage(recipientId,
+				getGenderAndLanguage(senderId)));
+		sendPost(requestHelper.generateResponseMessage(senderId,
+				getGenderAndLanguage(recipientId)));
+	}
+/**
+ * generate you are connected to male or female message 
+ * @param facebookId
+ * @return
+ * @throws ParseException
+ * @throws Exception
+ */
 	private static String getGenderAndLanguage(String facebookId) throws ParseException, Exception {
 		// TODO Auto-generated method stub
 		return JSONObject.quote(Constants.YOU_ARE_CONNECTED+new JSONObject(sendGet(facebookId)).getString("gender"));
 	}
-
+/**
+ * doing chatting action
+ * @param requestHelper
+ * @param senderId
+ * @throws Exception
+ */
 	public static void sendChatMessage(RequestParser requestHelper,
 			String senderId) throws Exception {
 		String recipientId = DataHandler.getRecipientId(senderId);
