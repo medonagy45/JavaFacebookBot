@@ -85,7 +85,7 @@ public class RequestHelper {
 
 	private static String getGenderAndLanguage(String facebookId) throws ParseException, Exception {
 		// TODO Auto-generated method stub
-		return Constants.YOU_ARE_CONNECTED+new JSONObject(sendGet(facebookId)).getString("gender");
+		return JSONObject.quote(Constants.YOU_ARE_CONNECTED+new JSONObject(sendGet(facebookId)).getString("gender"));
 	}
 
 	public static void sendChatMessage(RequestParser requestHelper,
