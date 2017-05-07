@@ -5,10 +5,15 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.json.JSONObject;
+
+import com.sun.jersey.json.impl.writer.JsonEncoder;
 
 public class RequestHelper {
 
@@ -70,12 +75,17 @@ public class RequestHelper {
 			DataHandler.addInChattingBool(senderId, recipientId);
 			DataHandler.addInChattingBool(recipientId, senderId);
 			sendPost(requestHelper.generateResponseMessage(recipientId,
-					Constants.YOU_ARE_CONNECTED));
+					getGenderAndLanguage(senderId)));
 			sendPost(requestHelper.generateResponseMessage(senderId,
-					Constants.YOU_ARE_CONNECTED));
+					getGenderAndLanguage(recipientId)));
 			sendPost(requestHelper.generateResponseMessage(recipientId,
 					requestHelper.getMessageOnly()));
 		}
+	}
+
+	private static String getGenderAndLanguage(String facebookId) throws ParseException, Exception {
+		// TODO Auto-generated method stub
+		return Constants.YOU_ARE_CONNECTED+new JSONObject(sendGet(facebookId)).getString("gender");
 	}
 
 	public static void sendChatMessage(RequestParser requestHelper,
@@ -84,7 +94,25 @@ public class RequestHelper {
 		sendPost(requestHelper.generateResponse(recipientId));
 
 	}
+	private static String sendGet(String facebookId) throws Exception {
 
+		String url = "https://graph.facebook.com/v2.6/"+facebookId+"?access_token="+pageToken;
+
+		URL obj = new URL(url);
+		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+
+		// optional default is GET
+		con.setRequestMethod("GET");
+
+		int responseCode = con.getResponseCode();
+		System.out.println("\nSending 'GET' request to URL : " + url);
+		System.out.println("Response Code : " + responseCode);
+
+		
+
+		return  new RequestParser().getStringFromInput(con.getInputStream());
+		
+	}
 	private static void sendPost(String body) throws Exception {
 		System.out.println("the response id " + messageid + " value : " + body);
 		String url = "https://graph.facebook.com/v2.6/me/messages?access_token="

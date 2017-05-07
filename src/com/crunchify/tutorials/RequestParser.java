@@ -75,7 +75,7 @@ public class RequestParser {
 		return jsonObjParent.getJSONArray("entry").getJSONObject(0)
 				.getJSONArray("messaging").getJSONObject(0);
 	}
-	private String getStringFromInput(InputStream incomingData) {
+	public String getStringFromInput(InputStream incomingData) {
 		StringBuilder crunchifyBuilder = new StringBuilder();
 		try {
 			BufferedReader in = new BufferedReader(new InputStreamReader(incomingData,"UTF-8"));

@@ -11,7 +11,7 @@ public class Constants {
 	public static final String SAY_HI_TO_RECONNECT=JSONObject.quote("say hi to reconnect");
 	
 	public static final String YOUR_PARTNER_LEFT=JSONObject.quote("your partner left,");
-	public static final String YOU_ARE_CONNECTED=JSONObject.quote("you are now connected ....");
+	public static final String YOU_ARE_CONNECTED=JSONObject.quote("you are now connected to a ");
 	
 	
 }
