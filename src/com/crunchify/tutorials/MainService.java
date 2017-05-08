@@ -83,6 +83,8 @@ public class MainService {
 	@Produces(MediaType.TEXT_PLAIN)
 	public Response verifyRESTService() {
 		String result = "CrunchifyRESTService Successfully started..\n";
+		result += ContextReader.getPageToken()+"\n";
+		result += ContextReader.getURI()+"\n";
 //		result += "joinedBefore "+joinedBefore ;
 		return Response.status(200).entity(result).build();
 	}

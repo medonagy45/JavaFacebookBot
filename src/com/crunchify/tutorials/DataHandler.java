@@ -1,5 +1,8 @@
 package com.crunchify.tutorials;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -7,6 +10,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.bson.Document;
@@ -26,8 +30,8 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 
 public class DataHandler {
-	static MongoClientURI uri = new MongoClientURI(
-			"mongodb://medonagy45:medonagy_2010@cluster0-shard-00-00-t5hjs.mongodb.net:27017,cluster0-shard-00-01-t5hjs.mongodb.net:27017,cluster0-shard-00-02-t5hjs.mongodb.net:27017/Cluster0?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin");
+	
+	static MongoClientURI uri = new MongoClientURI(ContextReader.getURI());
 
 	static MongoClient mongoClient = new MongoClient(uri);
 
@@ -58,7 +62,7 @@ public class DataHandler {
 		BasicDBObject whereQuery = new BasicDBObject();
 		whereQuery.put("senderId", senderId);
 		DBCursor cursor3 = chattingIds.find(whereQuery);
-		System.out.println(senderId +" is chatting with somone = "+cursor3.hasNext());
+		System.out.println(senderId +" is chatting with someone = "+cursor3.hasNext());
 		return cursor3.hasNext();
 		
 	}
@@ -131,10 +135,12 @@ public class DataHandler {
 		
 //		System.out.println("chattingIds");
 //		printall(chattingIds);
-		System.out.println("joinedBeforeIds");
-		printall(joinedBeforeIds);
+//		System.out.println("joinedBeforeIds");
+//		printall(joinedBeforeIds);
 //		System.out.println("waitingIds");
 //		printall(waitingIds);
+		
+		
 		
 	}
 }

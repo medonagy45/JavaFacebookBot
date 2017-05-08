@@ -23,12 +23,29 @@ public class RequestParser {
 		if(hasDelivery)
 			return true;
 		boolean hasRead = messaging.has("read");
-		return hasRead ;
+		if(hasRead)
+			return true;
+		if(checkIfSameMessageId())
+			return true;
+		return false;
 	}
-
+	public boolean checkIfSameMessageId(){
+		if(mid.equals(getMId())){
+			System.out.println("the message has the same ID as the previous one ");
+			System.out.println(messaging);
+				return true;
+		}
+		return false;
+	}
 	public String getMessageOnly() {
 		if(messaging.getJSONObject("message").has("text")){
 			return JSONObject.quote(messaging.getJSONObject("message").getString("text"));
+		}
+		return "";
+	}
+	public String getMId() {
+		if(messaging.getJSONObject("message").has("mid")){
+			return JSONObject.quote(messaging.getJSONObject("message").getString("mid"));
 		}
 		return "";
 	}
@@ -43,14 +60,17 @@ public class RequestParser {
 	}
 	
 	private String senderId;
-	public String getSenderId() {		
-		if(senderId==null)
+	static public String mid="";
+	public String getSenderId() {	
+		if(senderId==null){
 			senderId=messaging.getJSONObject("sender").getString("id");
+			System.out.println(messaging);
+		}
 		return senderId;
 	}
 
 	public String generateResponse(String id) {
-		System.out.println(messaging.getJSONObject("message").has("text"));
+		System.out.println("messaging string is having a text key "+messaging.getJSONObject("message").has("text"));
 		if(messaging.getJSONObject("message").has("text")){
 			String message = getMessageOnly();
 			return generateResponseMessage(id,message);
@@ -82,7 +102,7 @@ public class RequestParser {
 //					incomingData));
 			String line = null;
 			while ((line = in.readLine()) != null) {
-				System.out.println(line);
+//				System.out.println(line);
 				crunchifyBuilder.append(line);
 			}
 //			System.out.println("asdas "+crunchifyBuilder.toString());

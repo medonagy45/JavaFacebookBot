@@ -17,8 +17,7 @@ import com.sun.jersey.json.impl.writer.JsonEncoder;
 
 public class RequestHelper {
 
-	private static int messageid = 0;
-	private static String pageToken = "EAAGG9TjBpZBYBANajcXNZByydAPiNZApfO9PFudZCaZBmco1ZAghfdKz7CRyQIwKpHCahboBWmk2GU2cbZAV5ZCK9bjcmYkc9bLIbNm7YoGAQcP6LxwxoPpBrhO88q5IYlHbX6DavFxECemUw20bYJAsqF5E3ZARrlKxvYhddbxjAugZDZD";
+	private static String pageToken = ContextReader.getPageToken();
 
 	public static void sendInstructions(RequestParser requestHelper,
 			String senderId) throws Exception {
@@ -124,14 +123,12 @@ public class RequestHelper {
 		int responseCode = con.getResponseCode();
 		System.out.println("\nSending 'GET' request to URL : " + url);
 		System.out.println("Response Code : " + responseCode);
-
 		
-
 		return  new RequestParser().getStringFromInput(con.getInputStream());
 		
 	}
 	private static void sendPost(String body) throws Exception {
-		System.out.println("the response id " + messageid + " value : " + body);
+		System.out.println("the response value is : " + body);
 		String url = "https://graph.facebook.com/v2.6/me/messages?access_token="
 				+ pageToken;
 
@@ -156,13 +153,11 @@ public class RequestHelper {
 					con.getInputStream(), "utf-8"));
 			String line = null;
 			while ((line = br.readLine()) != null) {
-				System.out.println("the response of my send " + messageid
-						+ "value :" + line + "\n");
+				System.out.println("the response of my send value : " + line + "\n");
 			}
 			br.close();
 		} else {
-			System.out.println("the error message " + messageid + " "
-					+ con.getResponseCode());
+			System.out.println("the error message "+ con.getResponseCode());
 		}
 
 	}
